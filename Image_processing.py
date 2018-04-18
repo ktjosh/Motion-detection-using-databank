@@ -1,5 +1,3 @@
-
-
 import cv2
 import numpy as np
 from skimage.filters import threshold_otsu
@@ -10,7 +8,8 @@ from PIL import *
 def Do_image_processing():
 
     img_counter =0
-
+    SECONDS = 1
+    THRESHOLD = 5000
     capture_counter = 200
     do_subtraction = False
     avg_count = 4
@@ -57,7 +56,7 @@ def Do_image_processing():
 
             bbox_ccordinates=[]
             for labels in range (1,num_regions):
-                if Area_region[labels].area >5000:
+                if Area_region[labels].area >THRESHOLD:
                     bbox_ccordinates.append(Area_region[labels].bbox)
 
 
@@ -67,19 +66,11 @@ def Do_image_processing():
             #print(bbox_ccordinates)
 
 
-
-
-
-
-
-
-
-
             cv2.imshow('back_image',camera_image)
 
 
 
-            cv2.waitKey(3)
+            cv2.waitKey(SECONDS)
 
             pass
 
