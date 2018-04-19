@@ -16,7 +16,10 @@ def Do_image_processing():
     avg_image_counter = avg_count #takes averrage of those many images.
 
     _,camera_image = cv2.VideoCapture(0).read()
+    print(camera_image)
+
     img_height, img_width, img_channels = camera_image.shape
+    print(img_height, img_width, img_channels)
 
     avfg_img = np.zeros((img_height,img_width),dtype=np.float)
     background_model = np.zeros((img_height,img_width),dtype=np.float)
