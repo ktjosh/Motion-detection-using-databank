@@ -40,11 +40,12 @@ def Do_image_processing():
             forthefirsttime = False
 
 
-
+        #converting image to grayscale
         b_lab_image = cv2.cvtColor(camera_image, cv2.COLOR_BGR2GRAY)
-        #b_lab_image = lab_image[:,:,2]
+
+        #convert image from uint8 to floating point
         b_lab_image = scaletofloat(b_lab_image)
-        #taking the b color space from the lab color space
+
 
         if do_subtraction:
             """
@@ -52,15 +53,18 @@ def Do_image_processing():
             """
             #background subtracted image
             back_sub = cv2.absdiff(b_lab_image,background_model)
+
+            #finding the threshold to binarize the image
             thresh = threshold_otsu(back_sub)
+
+
+            #binarizing it
             ret, back_sub_binary = cv2.threshold(back_sub,thresh,1,cv2.THRESH_BINARY)
-            #back_sub_binary is the binary cinverted image.
+
 
             #doing im open to remove unwanted noise
-
             imopen_image = cv2.morphologyEx(back_sub_binary, cv2.MORPH_OPEN, structural_el)
 
-            #im2, contours, hierarchy = cv2.findContours(imopen_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
             #finding region in an image
             Bwlabel,num_regions =label(imopen_image, neighbors=None, background=0, return_num=True, connectivity=2)
