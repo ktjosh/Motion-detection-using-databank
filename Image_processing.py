@@ -1,3 +1,5 @@
+
+
 import cv2
 import numpy as np
 from skimage.filters import threshold_otsu
@@ -8,27 +10,36 @@ from PIL import *
 def Do_image_processing():
 
     img_counter =0
-    SECONDS = 1
-    THRESHOLD = 5000
+
     capture_counter = 200
     do_subtraction = False
     avg_count = 4
     avg_image_counter = avg_count #takes averrage of those many images.
+    path = "C:\\Users\\ketan\\PycharmProjects\\untitled\\ssup\\Experiment.mp4"
+    Vid = cv2.VideoCapture(path)
 
-    _,camera_image = cv2.VideoCapture(0).read()
-    print(camera_image)
-
-    img_height, img_width, img_channels = camera_image.shape
-    print(img_height, img_width, img_channels)
-
-    avfg_img = np.zeros((img_height,img_width),dtype=np.float)
-    background_model = np.zeros((img_height,img_width),dtype=np.float)
+    forthefirsttime = True
     structural_el = np.ones((5,5),np.float)
+    i=0
+    MINArea=5000
+    SECONDS=1
 
-    for i in range (capture_counter):
+    while (Vid.isOpened()):
 
-        _,camera_image = cv2.VideoCapture(0).read()
+        _,camera_image = Vid.read()
+        print(i)
         img_height, img_width, img_channels = camera_image.shape
+
+        if forthefirsttime:
+            """
+            we need to run this if statement only once to get the height and width of the image
+            """
+            img_height, img_width, img_channels = camera_image.shape
+            avfg_img = np.zeros((img_height, img_width), dtype=np.float)
+            background_model = np.zeros((img_height, img_width), dtype=np.float)
+            forthefirsttime = False
+
+
 
         b_lab_image = cv2.cvtColor(camera_image, cv2.COLOR_BGR2GRAY)
         #b_lab_image = lab_image[:,:,2]
@@ -59,14 +70,22 @@ def Do_image_processing():
 
             bbox_ccordinates=[]
             for labels in range (1,num_regions):
-                if Area_region[labels].area >THRESHOLD:
+                if Area_region[labels].area >MINArea:
                     bbox_ccordinates.append(Area_region[labels].bbox)
 
 
             for points in bbox_ccordinates:
                 cv2.rectangle(camera_image,(points[0],points[1]),(points[2],points[3]),(0,255,0),3)
-                pass
+
             #print(bbox_ccordinates)
+
+
+
+
+
+
+
+
 
 
             cv2.imshow('back_image',camera_image)
@@ -75,7 +94,7 @@ def Do_image_processing():
 
             cv2.waitKey(SECONDS)
 
-            pass
+
 
         if i > avg_image_counter:
             """
@@ -94,7 +113,7 @@ def Do_image_processing():
                 #cv2.imshow('hey', background_model)
                 #cv2.waitKey(4)
                 avfg_img = np.zeros((img_height, img_width), dtype=float)
-
+        i+=1
 
     img_save = cv2.cvtColor(camera_image, cv2.COLOR_BGR2GRAY)
     img_name = "opencv_frame_{}.png".format(img_counter)
