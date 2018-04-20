@@ -126,6 +126,8 @@ def BlobDetection(Binary_image):
     #each tuple has (x1,y1,x2,y2) coordinates of a bounding box
     #depends on the future design
 
+
+
 def justread():
     img = cv2.imread("C:\\Users\\ketan\\PycharmProjects\\untitled\\ssup\\opencv_frame_0.png")
 
