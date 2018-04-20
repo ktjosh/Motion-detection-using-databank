@@ -41,7 +41,7 @@ def main():
     soc = socket.socket()
 
     soc.bind(('',RECEIVE_PORT + int(id)))
-    soc.listen()
+    soc.listen(5)
 
     soc_from_server, addr = soc.accept()
     nbr_addr = soc_from_server.recv(1024)

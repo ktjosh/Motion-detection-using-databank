@@ -25,7 +25,7 @@ def main():
     WINDOW_SIZE = 1024
     server_sock = socket.socket()
     server_sock.bind(("", PORT))
-    server_sock.listen()
+    server_sock.listen(10)
 
     id2ip = {}
     while True:
