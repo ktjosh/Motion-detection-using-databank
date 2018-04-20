@@ -1,4 +1,6 @@
 import socket
+import pickle
+import cv2
 
 def server():
     WINDOW_SIZE = 1024
@@ -19,11 +21,19 @@ def server():
 
         # On receiving the data, it is written to file
         content = soc.recv(WINDOW_SIZE)
+        by = bytearray()
+        print(by)
         while (content):
-            new_file.write(content)
+            by.extend(content)
             content = soc.recv(WINDOW_SIZE)
 
         print("image created")
+        by = pickle.loads(by)
+        print(by)
+        print(by.shape)
+
+        # cv2.imshow("123454321",by)
+        # cv2.waitKey(0)
 
         # Close file and socket
         soc.close()

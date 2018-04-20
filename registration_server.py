@@ -8,8 +8,19 @@ def main():
     file = open("input.txt")
 
     content = file.readline()
+    first_line = content.split()
+    operator_no = first_line[0]
+    connections = first_line[1]
 
-    while content:
+    operator ={}
+    for _ in range(int(operator_no)):
+        content = file.readline()
+        lst = content.split()
+
+        operator[lst[0]] = lst[1]
+
+    for _ in range(int(connections)):
+        content = file.readline()
         lst = content.split()
 
         if lst[0] not in graph:
@@ -19,7 +30,8 @@ def main():
         for i in range(1,len(lst)):
             nodes.add(lst[i])
             graph[lst[0]].append(lst[i])
-        content = file.readline()
+
+    print(graph, operator)
 
     PORT = 2000
     WINDOW_SIZE = 1024
@@ -39,6 +51,7 @@ def main():
         else:
             temp = pickle.dumps(graph[received_id])
         soc.sendall(temp)
+        soc.sendall(pickle.dumps(operator[received_id]))
         soc.close()
 
         if len(nodes)==0:

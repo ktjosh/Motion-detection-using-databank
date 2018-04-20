@@ -1,2 +1,6 @@
+3 2
+1 capture
+2 grey_scale
+3 binarize
 1 2
 2 3

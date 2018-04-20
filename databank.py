@@ -1,4 +1,6 @@
 import socket
+import pickle
+import cv2
 
 class databank:
     # Output is the shared buffer, table is the table of pointers
@@ -27,8 +29,8 @@ class databank:
         PORT = 9000 + self.id
 
         # Received image will be stored in:
-        receivedImage = file_name
-        new_file = open(receivedImage, 'wb')
+        # receivedImage = file_name
+        # new_file = open(receivedImage, 'wb')
 
         # Open the server socket and bind it and listening for request
         serverSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -41,36 +43,46 @@ class databank:
 
             # On receiving the data, it is written to file
             content = soc.recv(WINDOW_SIZE)
-            while (content):
-                new_file.write(content)
+            np_serial = bytearray()
+            while content:
+                np_serial.extend(content)
                 content = soc.recv(WINDOW_SIZE)
 
-            print("image created")
+            np_obj = pickle.loads(np_serial)
+            print("RECEIVE COMPLETE")
+
+            cv2.imshow("INPUT", np_obj)
+            cv2.waitKey(1)
+            ### SAVE np_obj in input
 
             # Close file and socket
             soc.close()
-            new_file.close()
 
-    def client(self, host, port, _name, host_id):
+    def client(self, host, port, np_obj, host_id):
 
         WINDOW_SIZE = 1024
         HOST = host
         PORT = port + host_id
-        file_name = _name
-
-        # Open in 'b' because image reading in binary mode
-        file = open(file_name, 'rb')
 
         # Define socket and connect to server
         soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         soc.connect((HOST, PORT))
 
+        np_serial = pickle.dumps(np_obj)
+        start = 0
+        end = WINDOW_SIZE
+
         # Read bytes from file and send until the end of file
-        content = file.read(WINDOW_SIZE)
+        content = np_serial[start:end]
+
         while content:
             soc.send(content)
-            content = file.read(WINDOW_SIZE)
+            start += WINDOW_SIZE
+            end += WINDOW_SIZE
 
+            content = np_serial[start:end]
+
+        print("SENDING COMPLETE")
         # Close file and socket
         soc.close()
-        file.close()
+

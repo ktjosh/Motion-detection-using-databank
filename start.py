@@ -19,10 +19,6 @@ def main():
     id = input()
     node = databank.databank(id)
 
-    print("Enter operator:")
-    op = input()
-
-    node.set_operator(op)
 
     soc = socket.socket()
     soc.connect((HOST, PORT))
@@ -32,8 +28,11 @@ def main():
 
     neighbors = soc.recv(2048)
     neighbors = pickle.loads(neighbors)
-    print(neighbors, "<- my neighbors")
+    op = pickle.loads(soc.recv(2048))
 
+    node.set_operator(op)
+    print(neighbors, "<- my neighbors")
+    print(op, "<- operator")
     soc.close()
 
     # Connection for getting the IP
