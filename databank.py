@@ -2,6 +2,7 @@ import socket
 import pickle
 import cv2
 
+
 class databank:
     # Output is the shared buffer, table is the table of pointers
 

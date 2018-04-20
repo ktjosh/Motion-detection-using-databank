@@ -1,6 +1,7 @@
 import pickle
 import socket
-from databank.py import *
+
+import _thread
 
 import databank
 
@@ -49,6 +50,18 @@ def main():
     nbr_addr = pickle.loads(nbr_addr)
 
     print(nbr_addr, "are my neighbors")
+
+    """
+    code for creating thread server function in databank
+    it will create a thread for server
+    """
+
+    _thread.start_new_thread(node.server,())
+
+    """
+    code to perform operations based on th
+    """
+
 
 
 
