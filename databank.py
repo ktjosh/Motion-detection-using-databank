@@ -23,7 +23,7 @@ class databank:
     def use_operator(self):
         self.output = self.operator(self.input)
 
-    def server(self, file_name):
+    def server(self):
 
         WINDOW_SIZE = 1024
         PORT = 9000 + self.id
@@ -58,9 +58,10 @@ class databank:
             # Close file and socket
             soc.close()
 
-    def client(self, host, port, np_obj, host_id):
+    def client(self, host, np_obj, host_id):
 
         WINDOW_SIZE = 1024
+        port = 9000
         HOST = host
         PORT = port + host_id
 

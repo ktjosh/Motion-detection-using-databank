@@ -72,6 +72,7 @@ def main():
         data = pickle.dumps(nbr_addr_lst)
         soc1.sendall(data)
         print(nbr_addr_lst, "sent to", id)
+        soc1.close()
 
 
 
