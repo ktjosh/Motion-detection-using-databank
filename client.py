@@ -1,27 +1,26 @@
-import socket
 import pickle
-import cv2
+import socket
 
+import cv2
+import random
 
 def client():
     # ATTEMPT TO TRANSFER IMAGE
 
     HOST = "localhost"
     PORT = 9000
-    BUFFER_SIZE = 4096
-
-    # Define socket and connect to server
-    soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    soc.connect((HOST, PORT))
+    WINDOW_SIZE = 4096
+    id = random.randint(10,20)
+    print(id)
 
     img_list = []
-
     path = "Experiment.mp4"
     vid = cv2.VideoCapture(path)
 
     while vid.isOpened():
         # frame by frame is read here
         _, frame = vid.read()
+
         try:
             if len(frame) > 0:
                 gray_frame = GrayScale(frame)
@@ -31,45 +30,61 @@ def client():
         except TypeError:
             break
 
-    print("Video Done", len(img_list))
+    print("Video Done")
 
-    # Sending the imd_list to the server
+    # Sending the img_list to the server
 
-    # If you want to send the whole img_lst
-    image_serial = pickle.dumps(img_list)
-    start = 0
-    end = BUFFER_SIZE
-    content = image_serial[start:end]
+    # # If you want to send the whole img_lst
 
-    while content:
-        soc.send(content)
-        start += BUFFER_SIZE
-        end += BUFFER_SIZE
-        content = image_serial[start:end]
+    # # Define socket and connect to server
+    # soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # soc.connect((HOST, PORT))
 
-    # # If you want send 10 images at a time
-    # buffer_list = []
+    # image_serial = pickle.dumps(img_list)
+    # start = 0
+    # end = WINDOW_SIZE
+    # content = image_serial[start:end]
     #
-    # for i in range(len(img_list)):
-    #
-    #     buffer_list.append(img_list[i])
-    #     if (i+1) % 10 == 0:
-    #         file = pickle.dumps(buffer_list)
-    #         start = 0
-    #         end = BUFFER_SIZE
-    #         content = file[start:end]
-    #         while content:
-    #             i += 1
-    #             print(i)
-    #             soc.send(content)
-    #             start += BUFFER_SIZE
-    #             end += BUFFER_SIZE
-    #             content = file[start:end]
-    #     buffer_list= []
-    #     exit(251)
-    #
-    # # Close file and socket
-    # soc.close()
+    # while content:
+    #     soc.send(content)
+    #     start += WINDOW_SIZE
+    #     end += WINDOW_SIZE
+    #     content = image_serial[start:end]
+
+    # If you want send 10 images at a time
+
+    IMAGE_BURST = len(img_list)
+    buffer_list = []
+
+    for i in range(len(img_list)+1):
+
+        if i != len(img_list):
+            buffer_list.append(img_list[i])
+
+        if (i+1) % IMAGE_BURST == 0:  # or i == len(img_list):
+
+            soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            soc.connect((HOST, PORT))
+            soc.send(pickle.dumps(id))
+
+            file = pickle.dumps(buffer_list)
+            start = 0
+            end = WINDOW_SIZE
+            content = file[start:end]
+
+            while content:
+
+                soc.send(content)
+                start += WINDOW_SIZE
+                end += WINDOW_SIZE
+                content = file[start:end]
+
+            print("Sent", len(buffer_list))
+            buffer_list= []
+
+            # Close socket
+            soc.close()
+
 
 
 def GrayScale(input_image):

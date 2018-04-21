@@ -21,8 +21,6 @@ def main():
     id = input()
     node = databank.databank(id)
 
-
-
     soc = socket.socket()
     soc.connect((HOST, PORT))
     soc.send(bytes(id, "utf-8"))

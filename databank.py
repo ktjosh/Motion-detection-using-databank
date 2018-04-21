@@ -1,6 +1,5 @@
-import socket
 import pickle
-import cv2
+import socket
 
 
 class databank:
@@ -26,65 +25,94 @@ class databank:
 
     def server(self):
 
-        WINDOW_SIZE = 1024
+        WINDOW_SIZE = 4096
         PORT = 9000 + self.id
-
-        # Received image will be stored in:
-        # receivedImage = file_name
-        # new_file = open(receivedImage, 'wb')
 
         # Open the server socket and bind it and listening for request
         serverSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         serverSock.bind(('', PORT))
         serverSock.listen(10)
 
+        source_data_dict = {}
+
         while True:
+            print("**Waiting for new connection")
 
             soc, addr = serverSock.accept()
 
-            # On receiving the data, it is written to file
-            content = soc.recv(WINDOW_SIZE)
-            np_serial = bytearray()
-            while content:
-                np_serial.extend(content)
+            # Receive the ID of the user
+            id = pickle.loads(soc.recv(WINDOW_SIZE))
+
+            if id not in source_data_dict:
+                source_data_dict[id] = []
+
+            try:
+
                 content = soc.recv(WINDOW_SIZE)
+                by = bytearray()
 
-            np_obj = pickle.loads(np_serial)
-            print("RECEIVE COMPLETE")
+                while content:
+                    by.extend(content)
+                    content = soc.recv(WINDOW_SIZE)
 
-            cv2.imshow("INPUT", np_obj)
-            cv2.waitKey(1)
-            ### SAVE np_obj in input
+                    if len(content) == 0:
+                        img_lst = pickle.loads(by)
+                        source_data_dict[id].extend(img_lst)
+                        break
+
+            except EOFError:
+                print("EOFError")
+
+            print(len(source_data_dict[id]))
+            print("\n")
 
             # Close file and socket
             soc.close()
 
     def client(self, host, np_obj, host_id):
 
-        WINDOW_SIZE = 1024
+        WINDOW_SIZE = 4096
         port = 9000
         HOST = host
         PORT = port + host_id
 
         # Define socket and connect to server
-        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        soc.connect((HOST, PORT))
+        # soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # soc.connect((HOST, PORT))
 
-        np_serial = pickle.dumps(np_obj)
-        start = 0
-        end = WINDOW_SIZE
+        # Get the length of your output buffer
+        IMAGE_BURST = len(self.output)
+        buffer_list = []
 
-        # Read bytes from file and send until the end of file
-        content = np_serial[start:end]
+        for i in range(IMAGE_BURST + 1):
 
-        while content:
-            soc.send(content)
-            start += WINDOW_SIZE
-            end += WINDOW_SIZE
+            if i != IMAGE_BURST:
+                buffer_list.append(self.output[i])
 
-            content = np_serial[start:end]
+            if (i + 1) % IMAGE_BURST == 0:  # or i == len(img_list):
 
-        print("SENDING COMPLETE")
-        # Close file and socket
-        soc.close()
+                soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                soc.connect((HOST, PORT))
 
+                # Send ID
+                soc.send(pickle.dumps(id))
+
+                # Send the Buffer
+                np_serial = pickle.dumps(buffer_list)
+                start = 0
+                end = WINDOW_SIZE
+
+                # Read bytes from file and send until the end of file
+                content = np_serial[start:end]
+
+                while content:
+                    soc.send(content)
+                    start += WINDOW_SIZE
+                    end += WINDOW_SIZE
+                    content = np_serial[start:end]
+                buffer_list = []
+
+                print("*Buffer Sent")
+
+                # Close socket
+                soc.close()

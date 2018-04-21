@@ -1,47 +1,56 @@
 import socket
 import pickle
+
 import cv2
 import numpy as np
 
 
 def server():
     PORT = 9000
-    BUFFER_SIZE = 4096
+    WINDOW_SIZE = 4096
 
     # Open the server socket and bind it and listening for request
     serverSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     serverSock.bind(('', PORT))
-    serverSock.listen(10)
+    serverSock.listen()
 
     # To continously listen to new connections
+
+    source_data_dict = {}
+
     while True:
-        print("Waiting for new connection")
+
+        print("**Waiting for new connection")
         soc, addr = serverSock.accept()
         print("connection received")
 
-        # On receiving the data, it is written to file
+        # Receive the ID of the user
+        id = pickle.loads(soc.recv(WINDOW_SIZE))
+
+        if id not in source_data_dict:
+            source_data_dict[id] = []
 
         try:
 
-            # Not needed if sending the whole video in one go
-
-            content = soc.recv(BUFFER_SIZE)
+            content = soc.recv(WINDOW_SIZE)
             by = bytearray()
 
             while content:
                 by.extend(content)
-                content = soc.recv(BUFFER_SIZE)
+                content = soc.recv(WINDOW_SIZE)
 
                 if len(content) == 0:
 
-                    img = pickle.loads(by)
-                    print(len(img))
+                    img_lst = pickle.loads(by)
+                    source_data_dict[id].extend(img_lst)
+
                     break
 
         except EOFError:
             print("EOFError")
 
-        print("received")
+        print(len(source_data_dict[id]))
+        print("\n")
 
         # Close file and socket
         soc.close()
@@ -49,3 +58,4 @@ def server():
 
 if __name__ == "__main__":
     server()
+
