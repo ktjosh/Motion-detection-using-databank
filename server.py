@@ -12,7 +12,7 @@ def server():
     # Open the server socket and bind it and listening for request
     serverSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     serverSock.bind(('', PORT))
-    serverSock.listen()
+    serverSock.listen(20)
 
     # To continously listen to new connections
 

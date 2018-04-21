@@ -22,12 +22,16 @@ def client():
         _, frame = vid.read()
 
         try:
-            if len(frame) > 0:
-                gray_frame = GrayScale(frame)
-                img_list.append(gray_frame)
+            if _ == True:
+                #gray_frame = GrayScale(frame)
+                img_list.append(frame)
+
+            else:
+                break
 
         # Error encountered on the last frame: None is sent
         except TypeError:
+            print("type+error")
             break
 
     print("Video Done")

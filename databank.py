@@ -5,14 +5,15 @@ import socket
 class databank:
     # Output is the shared buffer, table is the table of pointers
 
-    __slots__ = "output", "flow_table", "id", "operator", "input"
+    __slots__ = "output", "flow_table", "id", "operator", "input", "trigger"
 
     def __init__(self, id, operator=None):
         self.output = []
-        self.input = []
+        self.input = {}
         self.flow_table = {}
         self.id = id
         self.operator = operator
+        self.trigger = False
 
     def set_operator(self, operator):
         self.operator = operator
@@ -26,14 +27,12 @@ class databank:
     def server(self):
 
         WINDOW_SIZE = 4096
-        PORT = 9000 + self.id
+        PORT = 9000 + int(self.id)
 
         # Open the server socket and bind it and listening for request
         serverSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         serverSock.bind(('', PORT))
         serverSock.listen(10)
-
-        source_data_dict = {}
 
         while True:
             print("**Waiting for new connection")
@@ -42,9 +41,10 @@ class databank:
 
             # Receive the ID of the user
             id = pickle.loads(soc.recv(WINDOW_SIZE))
+            print("Received connection from", id)
 
-            if id not in source_data_dict:
-                source_data_dict[id] = []
+            if id not in self.input:
+                self.input[id] = []
 
             try:
 
@@ -57,28 +57,26 @@ class databank:
 
                     if len(content) == 0:
                         img_lst = pickle.loads(by)
-                        source_data_dict[id].extend(img_lst)
+                        self.input[id].extend(img_lst)
                         break
 
             except EOFError:
                 print("EOFError")
 
-            print(len(source_data_dict[id]))
-            print("\n")
+            print(len(self.input[id]))
+
+            # TENTATIVE
+            self.trigger = True
 
             # Close file and socket
             soc.close()
 
-    def client(self, host, np_obj, host_id):
+    def client(self, host, host_id):
 
         WINDOW_SIZE = 4096
         port = 9000
         HOST = host
-        PORT = port + host_id
-
-        # Define socket and connect to server
-        # soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # soc.connect((HOST, PORT))
+        PORT = port + int(host_id)
 
         # Get the length of your output buffer
         IMAGE_BURST = len(self.output)
