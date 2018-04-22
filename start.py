@@ -48,7 +48,7 @@ def main():
     soc.connect((HOST, PORT))
     soc.send(bytes(id, "utf-8"))
 
-    print(id, "sent to server")
+    print(id, "sent to receiver")
 
     # get the tuple of (nbr, operator, incoming_count)
     tuple = pickle.loads(soc.recv(2048))
@@ -78,7 +78,7 @@ def main():
     print("Neighbors:", neighbors)
     print("Neighbor IP", nbr_addr)
 
-    node.server()
+    node.receiver()
     print("Using operation:" + op)
     node.use_operator()
 
@@ -86,7 +86,7 @@ def main():
     if len(neighbors) != 0:
         for i in range(len(nbr_addr)):
             print("Sending data to", neighbors[i])
-            node.client(nbr_addr[i], int(neighbors[i]))
+            node.sender(nbr_addr[i], int(neighbors[i]))
 
     # if node.id == '4':
     #     for frame in node.output:

@@ -3,33 +3,68 @@ import socket
 
 
 class databank:
-    # Output is the shared buffer, table is the table of pointers
+    """
+    The databank class is present at each node in the data-flow graph
+    It is used to route the data to different nodes for processing
+
+    output: The output buffer to be sent to the next node
+    input: The dictionary containing key as the source node id and
+            value as the output buffer of the source
+    incoming_edge_count: Number of incoming edges into the node
+    id: Node id
+    operator: operator of the node
+    """
+
     __slots__ = "output", "incoming_edge_count", "id", \
-                "operator", "input", "trigger"
+                "operator", "input"
 
     def __init__(self, id, operator=None):
+        """
+        The constructor of databank class
+        :param id: Node id
+        :param operator: Operator of databank class
+        """
+
         self.output = []
         self.input = {}
         self.incoming_edge_count = {}
         self.id = id
         self.operator = operator
-        self.trigger = False
 
     def set_operator(self, operator):
+        """
+        Setting the operator of databank
+        :param operator: operator to be set
+        :return: None
+        """
         self.operator = operator
 
     def set_incoming_edges(self, count):
+        """
+        Setting the incoming edges at the node of databank
+        :param count: Count of incoming edges
+        :return: None
+        """
         self.incoming_edge_count = count
 
     def use_operator(self):
+        """
+        Apply the operator on the input to get the output
+        :return: None
+        """
         self.output = self.operator(self.input)
 
-    def server(self):
+    def receiver(self):
+        """
+        The code to receive the buffer from the source node
+        and save it in the input dictionary
+        :return: None
+        """
 
         WINDOW_SIZE = 4096
         PORT = 9000 + int(self.id)
 
-        # Open the server socket and bind it and listening for request
+        # Open the receiver socket and bind it and listening for request
         serverSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         serverSock.bind(('', PORT))
         serverSock.listen(10)
@@ -69,7 +104,14 @@ class databank:
             # Close file and socket
             soc.close()
 
-    def client(self, host, host_id):
+    def sender(self, host, host_id):
+        """
+        The code to send the output buffer to the host
+
+        :param host: The id of the receiver
+        :param host_id: The address of the receiver
+        :return: None
+        """
 
         WINDOW_SIZE = 4096
         port = 9000
