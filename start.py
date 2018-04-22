@@ -13,10 +13,13 @@ def assign_operator(op):
         return img_op.GrayScale
     if op == "binarize":
         return img_op.imBinarize
+    if op == "display_len":
+        return img_op.display_len
 
 
 def main():
     HOST = input("Enter IP: ")
+    # HOST = "localhost"
     PORT = 2000
 
     id = input("Enter ID: ")
@@ -55,7 +58,9 @@ def main():
 
     print(nbr_addr, "are my neighbors")
 
+    print()
     node.server()
+    print("Using operation:" + op)
     node.use_operator()
 
     # Send data to all neighbors

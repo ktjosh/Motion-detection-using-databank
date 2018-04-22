@@ -13,6 +13,15 @@ from skimage.filters import threshold_otsu
 from skimage.measure import *
 
 
+def display_len(input_image_dct):
+    print("\tlength of input dict:", len(input_image_dct))
+
+    for key in input_image_dct:
+        print(key,"Length of the buffer",len(input_image_dct[key]),
+              "Shape:", input_image_dct[key][0])
+
+    return None
+
 def GrayScale(input_image_dct):
     """
     Converts a colored image to grayscale

@@ -40,6 +40,7 @@ class databank:
 
             soc, addr = serverSock.accept()
             conn_count += 1
+
             # Receive the ID of the user
             id = pickle.loads(soc.recv(WINDOW_SIZE))
             print("Received connection from", id)
@@ -64,7 +65,7 @@ class databank:
             except EOFError:
                 print("EOFError")
 
-            print(len(self.input[id]))
+            print("Input received")
 
             # Close file and socket
             soc.close()
@@ -91,7 +92,7 @@ class databank:
                 soc.connect((HOST, PORT))
 
                 # Send ID
-                soc.send(pickle.dumps(id))
+                soc.send(pickle.dumps(self.id))
 
                 # Send the Buffer
                 np_serial = pickle.dumps(buffer_list)

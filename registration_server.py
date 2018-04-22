@@ -76,6 +76,7 @@ def main():
             pickle.dumps((nbr_to_node, operator_to_node, in_edge_to_node)))
         soc.close()
 
+
         if len(nodes) == 0:
             break
 
