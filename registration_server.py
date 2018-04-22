@@ -3,6 +3,13 @@ import socket
 
 
 def main():
+    """
+    main function that reads the toplogy of all the nodes int the system.
+    once topology is read, it sends the information about the neighbors, their IP address, number of incomig an
+    outgoing edge information to each node as it connects to the registration server.
+    :return:
+    """
+
     print("My IP:", socket.gethostbyname(socket.gethostname()))
     graph = {}
     nodes = set()
@@ -52,10 +59,14 @@ def main():
     server_sock.bind(("", PORT))
     server_sock.listen(10)
 
+    # a dictionary is generated to map each id of the node to its corresponding ip address.
     id2ip = {}
+
+    # the loop is run until all the nodes have connected and sent information
     while True:
         soc, addr = server_sock.accept()
 
+        # id of each node will be receieved here.
         received = soc.recv(WINDOW_SIZE)
         received_id = received.decode("utf-8")
 
@@ -82,6 +93,9 @@ def main():
 
     print(id2ip)
     RECEIVE_PORT = 10000
+
+    # once all the nodes are connected and all the ips are receieved, each node will be sent all the necessary
+    # information
     for id in id2ip:
         addr = id2ip[id][0]
         soc1 = socket.socket()
