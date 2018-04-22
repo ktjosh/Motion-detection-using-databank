@@ -19,8 +19,7 @@ def main():
     HOST = input("Enter IP: ")
     PORT = 2000
 
-    print("Enter ID:")
-    id = input()
+    id = input("Enter ID: ")
     node = databank.databank(id)
 
     soc = socket.socket()
@@ -59,10 +58,11 @@ def main():
     node.server()
     node.use_operator()
 
-    # Send data to ALL neighbors require FOR LOOP IN FUTURE
+    # Send data to all neighbors
     if len(neighbors) != 0:
-        print("Sending data to", neighbors[0])
-        node.client(nbr_addr[0], int(neighbors[0]))
+        for i in range(len(nbr_addr)):
+            print("Sending data to", neighbors[i])
+            node.client(nbr_addr[i], int(neighbors[i]))
 
     # if node.id == '3':
     #     for frame in node.output:

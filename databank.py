@@ -3,7 +3,6 @@ import socket
 
 
 class databank:
-
     # Output is the shared buffer, table is the table of pointers
     __slots__ = "output", "incoming_edge_count", "id", \
                 "operator", "input", "trigger"
@@ -66,9 +65,6 @@ class databank:
                 print("EOFError")
 
             print(len(self.input[id]))
-
-            # TENTATIVE
-            self.trigger = True
 
             # Close file and socket
             soc.close()

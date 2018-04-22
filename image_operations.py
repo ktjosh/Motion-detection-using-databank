@@ -19,7 +19,7 @@ def GrayScale(input_image_dct):
     :param input_image_dct: input will be a dictionary of source id :input image
     :return:
     """
-    output =[]
+    output = []
     for key in input_image_dct:
         for img in input_image_dct[key]:
             gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -34,7 +34,7 @@ def imBinarize(input_image_dct):
     :param input_image_dct:the dictionary of source id :input image will be a 2-D grayscale image
     :return:
     """
-    output =[]
+    output = []
 
     for key in input_image_dct:
         for img in input_image_dct[key]:
@@ -44,6 +44,7 @@ def imBinarize(input_image_dct):
 
     print("done with binarizing")
     return output
+
 
 def scaletofloat(img):
     """
@@ -56,6 +57,7 @@ def scaletofloat(img):
     rt = (img.astype('float') - pixelmin) / (pixelmax - pixelmin)
     return rt
 
+
 def imopen(Binary_image):
     """
     Takes binary image as input, perform morphological opening and returns
@@ -63,9 +65,10 @@ def imopen(Binary_image):
     :param Binary_image: input wil be a blackand white binary image
     :return: return a noisefree image
     """
-    structural_el = np.ones((10,10),np.float)
+    structural_el = np.ones((10, 10), np.float)
     imopen_image = cv2.morphologyEx(Binary_image, cv2.MORPH_OPEN, structural_el)
     return imopen_image
+
 
 def VideoCapture(dct):
     """
@@ -73,14 +76,14 @@ def VideoCapture(dct):
     :return:
     """
 
-    #this path is just for testing
-    output=[]
+    # this path is just for testing
+    output = []
     path = "Experiment.mp4"
     Vid = cv2.VideoCapture(path)
-    while(Vid.isOpened()):
-        #frame by frame is read here
-        rt,frame = Vid.read()
-        #grayscale
+    while (Vid.isOpened()):
+        # frame by frame is read here
+        rt, frame = Vid.read()
+        # grayscale
         if rt != False:
             output.append(frame)
         else:
@@ -89,9 +92,9 @@ def VideoCapture(dct):
     print("done with video capture")
     return output
 
-    #code for converting it to grayscale
-    #and then storing it in Databank
-    #depends on the future design
+    # code for converting it to grayscale
+    # and then storing it in Databank
+    # depends on the future design
 
 
 def BlobDetection(Binary_image):
@@ -101,10 +104,10 @@ def BlobDetection(Binary_image):
     :return:
     """
 
-
     MINArea = 5000
     Imopen_image = imopen(Binary_image)
-    Bwlabel, num_regions = label(Imopen_image, neighbors=None, background=0, return_num=True, connectivity=2)
+    Bwlabel, num_regions = label(Imopen_image, neighbors=None, background=0,
+                                 return_num=True, connectivity=2)
 
     # print(num_regions)
     Area_region = regionprops(Bwlabel, intensity_image=None, cache=True)
@@ -114,6 +117,6 @@ def BlobDetection(Binary_image):
         if Area_region[labels].area > MINArea:
             bbox_ccordinates.append(Area_region[labels].bbox)
 
-    #bbox_coordinates is a list containing tuples
-    #each tuple has (x1,y1,x2,y2) coordinates of a bounding box
-    #depends on the future design
+            # bbox_coordinates is a list containing tuples
+            # each tuple has (x1,y1,x2,y2) coordinates of a bounding box
+            # depends on the future design
