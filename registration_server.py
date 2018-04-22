@@ -3,6 +3,7 @@ import socket
 
 
 def main():
+    print("My IP:", socket.gethostbyname(socket.gethostname()))
     graph = {}
     nodes = set()
     file = open("input.txt")
@@ -49,7 +50,7 @@ def main():
     WINDOW_SIZE = 1024
     server_sock = socket.socket()
     server_sock.bind(("", PORT))
-    server_sock.listen()
+    server_sock.listen(10)
 
     id2ip = {}
     while True:
@@ -62,7 +63,7 @@ def main():
         id2ip[received_id] = addr
         nodes.remove(received_id)
 
-        # send the neighbors
+        # send the neighbor id
         if received_id not in graph:
             nbr_to_node = []
         else:

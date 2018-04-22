@@ -16,7 +16,7 @@ def assign_operator(op):
 
 
 def main():
-    HOST = "localhost"
+    HOST = input("Enter IP: ")
     PORT = 2000
 
     print("Enter ID:")
@@ -28,13 +28,6 @@ def main():
     soc.send(bytes(id, "utf-8"))
 
     print(id, "sent to server")
-
-    # neighbors = pickle.loads(soc.recv(1024))
-    # print(neighbors, "<- my neighbors")
-    # op = pickle.loads(soc.recv(1024))
-    # print(op, "<- operator")
-    # incoming_count = int(pickle.loads(soc.recv(1024)))
-    # print(incoming_count,"<- incoming count")
 
     # get the tuple of (nbr, operator, incoming_count)
     tuple = pickle.loads(soc.recv(2048))
@@ -66,10 +59,10 @@ def main():
     node.server()
     node.use_operator()
 
-    # Send data to neighbors
+    # Send data to ALL neighbors require FOR LOOP IN FUTURE
     if len(neighbors) != 0:
         print("Sending data to", neighbors[0])
-        node.client("localhost", int(neighbors[0]))
+        node.client(nbr_addr[0], int(neighbors[0]))
 
     # if node.id == '3':
     #     for frame in node.output:
