@@ -3,14 +3,15 @@ import socket
 
 
 class databank:
-    # Output is the shared buffer, table is the table of pointers
 
-    __slots__ = "output", "flow_table", "id", "operator", "input", "trigger"
+    # Output is the shared buffer, table is the table of pointers
+    __slots__ = "output", "incoming_edge_count", "id", \
+                "operator", "input", "trigger"
 
     def __init__(self, id, operator=None):
         self.output = []
         self.input = {}
-        self.flow_table = {}
+        self.incoming_edge_count = {}
         self.id = id
         self.operator = operator
         self.trigger = False
@@ -18,8 +19,8 @@ class databank:
     def set_operator(self, operator):
         self.operator = operator
 
-    def add_edge(self, nbr_databank):
-        self.flow_table[nbr_databank.id] = nbr_databank
+    def set_incoming_edges(self, count):
+        self.incoming_edge_count = count
 
     def use_operator(self):
         self.output = self.operator(self.input)
@@ -33,12 +34,13 @@ class databank:
         serverSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         serverSock.bind(('', PORT))
         serverSock.listen(10)
+        conn_count = 0
 
-        while True:
+        while conn_count != self.incoming_edge_count:
             print("**Waiting for new connection")
 
             soc, addr = serverSock.accept()
-
+            conn_count += 1
             # Receive the ID of the user
             id = pickle.loads(soc.recv(WINDOW_SIZE))
             print("Received connection from", id)
