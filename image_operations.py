@@ -223,6 +223,7 @@ def Blob_Detection_and_Bounding_box(input_img_dct):
         cv2.imshow('OUTPUT',camera_image)
         cv2.waitKey(4)
 
+
 def GRAY2BINARY(input_image):
     """
     The method uses otsu's method to find the threshold to convert it to a binary image.
@@ -232,3 +233,37 @@ def GRAY2BINARY(input_image):
     thresh = threshold_otsu(input_image)
     ret, binarized = cv2.threshold(input_image, thresh, 1, cv2.THRESH_BINARY)
     return binarized
+
+
+def background_model(input_image_dct):
+    """
+    The function takes input as dictctionary containing lists of grayscale images
+    it converts integer images to float and creates a background model depending on
+    the number of frames to be taken for averaging
+    :param input_image_dct: dictionary containing list of grayscaled images
+    :return: list containing background model
+    """
+
+
+    output =[]
+    back_model_size =5
+    height,width = 0,0
+    for keys in input_image_dct:
+        for img in input_image_dct[keys]:
+            height,width = img.shape
+            break
+    avg_img = np.zeros((height,width),dtype=float)
+    for keys in input_image_dct:
+        for idx  in  range (len(input_image_dct[keys])):
+            img = scaletofloat(input_image_dct[keys][idx])
+            avg_img = cv2.add(avg_img, img)
+            if (idx+1) % back_model_size == 0:
+                back_model = avg_img / back_model_size
+                output.append(back_model)
+                avg_img = np.zeros((height, width), dtype=float)
+    # print(len(output))
+    # cv2.namedWindow('ketan')
+    # for images in output:
+    #     cv2.imshow('ketan',images)
+    #     cv2.waitKey(2)
+    return output

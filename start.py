@@ -1,12 +1,17 @@
 import pickle
 import socket
-
+import cv2
 import image_operations as img_op
 
 import databank
 
 
 def assign_operator(op):
+    """
+    Assign the operator based on its name
+    :param op: name of operator
+    :return: operator
+    """
     if op == "capture":
         return img_op.VideoCapture
     if op == "grey_scale":
@@ -15,11 +20,25 @@ def assign_operator(op):
         return img_op.imBinarize
     if op == "display_len":
         return img_op.display_len
+    if op == "bg_model":
+        return  img_op.background_model
+    if op == "subtraction_binarize":
+        return img_op.Background_Subtraction_And_Binarize
+    if op == "blob_detect":
+        return img_op.Blob_Detection_and_Bounding_box
 
 
 def main():
-    HOST = input("Enter IP: ")
-    # HOST = "localhost"
+    """
+    The main method.
+    The databank object is assigned to the node
+    The node waits for its data from other data, processes its data
+    and sends the data
+
+    :return: None
+    """
+    # HOST = input("Enter IP: ")
+    HOST = "localhost"
     PORT = 2000
 
     id = input("Enter ID: ")
@@ -56,9 +75,9 @@ def main():
     nbr_addr = soc_from_server.recv(1024)
     nbr_addr = pickle.loads(nbr_addr)
 
-    print(nbr_addr, "are my neighbors")
+    print("Neighbors:", neighbors)
+    print("Neighbor IP", nbr_addr)
 
-    print()
     node.server()
     print("Using operation:" + op)
     node.use_operator()
@@ -69,14 +88,10 @@ def main():
             print("Sending data to", neighbors[i])
             node.client(nbr_addr[i], int(neighbors[i]))
 
-    # if node.id == '3':
+    # if node.id == '4':
     #     for frame in node.output:
     #         cv2.imshow('hey',frame)
-    #         cv2.waitKey(1)
-
-    """
-    code to perform operations based on th
-    """
+    #         cv2.waitKey(2)
 
 
 if __name__ == "__main__":

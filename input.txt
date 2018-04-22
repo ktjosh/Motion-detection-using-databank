@@ -1,13 +1,15 @@
-4 4
+5 4
 1 capture
 2 grey_scale
-3 binarize
-4 display_len
-1 2
-2 3
-2 4
+3 bg_model
+4 subtraction_binarize
+5 blob_detect
+1 2 5
+2 3 4
 3 4
+4 5
 1 0
 2 1
 3 1
 4 2
+5 2

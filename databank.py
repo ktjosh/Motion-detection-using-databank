@@ -47,7 +47,6 @@ class databank:
 
             if id not in self.input:
                 self.input[id] = []
-
             try:
 
                 content = soc.recv(WINDOW_SIZE)
