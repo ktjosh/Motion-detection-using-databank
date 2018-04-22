@@ -35,7 +35,24 @@ def img_process():
 
 
 
+def testing():
+    output=[]
+    path = "Experiment.mp4"
+    Vid = cv2.VideoCapture(path)
+    while (Vid.isOpened()):
+        # frame by frame is read here
+        rt, frame = Vid.read()
+        # grayscale
+        if rt != False:
+            frame =  cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            output.append(frame)
+        else:
+            break
 
+    print("done with video capture")
+    dict ={}
+    dict[1]=output
+    Background_Model(dict)
 
 
 """
@@ -45,16 +62,23 @@ scaletoFloat: converts a uint8 image to floating point.
 imopen : morphological operations
 VideoCapture: Captures the frame by frame from the prerecorded video
 Blob detection: Detects blobs in binary image
+Background Model
+Background Subtraction
 """
 
-def GrayScale(input_image):
+def GrayScale(input_image_dct):
     """
     Converts a colored image to grayscale
-    :param input_image: input will be a numpy array of coloed image
+    :param input_image_dct: input will be a dictionary of source id :input image
     :return:
     """
-    gray_image = cv2.cvtColor(input_image, cv2.COLOR_BGR2GRAY)
-    return gray_image
+    output = []
+    for key in input_image_dct:
+        for img in input_image_dct[key]:
+            gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            output.append(gray_image)
+    print("completed grayscale")
+    return output
 
 
 def imBinarize(input_image):
@@ -96,7 +120,7 @@ def VideoCapture():
     """
 
     #this path is just for testing
-    path = "..\\Experiment.mp4"
+    path = "\\Experiment.mp4"
     Vid = cv2.VideoCapture(path)
     while(Vid.isOpened()):
         #frame by frame is read here
@@ -126,6 +150,77 @@ def BlobDetection(Binary_image):
     #each tuple has (x1,y1,x2,y2) coordinates of a bounding box
     #depends on the future design
 
+def Background_Model(input_image_dct):
+    """
+    The function takes input as dictctionary containing lists of grayscale images
+    it converts integer images to float and creates a background model depending on
+    the number of frames to be taken for averaging
+    :param input_image_dct: dictionary containing list of grayscaled images
+    :return: list containing background model
+    """
+
+
+    output =[]
+    back_model_size =5
+    height,width = 0,0
+    for keys in input_image_dct:
+        for img in input_image_dct[keys]:
+            height,width = img.shape
+            break
+    avg_img = np.zeros((height,width),dtype=float)
+    for keys in input_image_dct:
+        for idx  in  range (len(input_image_dct[keys])):
+            img = scaletofloat(input_image_dct[keys][idx])
+            avg_img = cv2.add(avg_img, img)
+            if (idx+1) % back_model_size == 0:
+                back_model = avg_img / back_model_size
+                output.append(back_model)
+                avg_img = np.zeros((height, width), dtype=float)
+    # print(len(output))
+    # cv2.namedWindow('ketan')
+    # for images in output:
+    #     cv2.imshow('ketan',images)
+    #     cv2.waitKey(2)
+    return output
+
+def Background_Subtraction(input_image_dct):
+    """
+    fucntion takes input as a dictionary contianing list of gray scled images and background models
+    it performs background subtraction and stores it in a list
+    :param input_image_dct: dictionary contaning two lists 1.gray scaled images in 'uint8' format and
+    background model in 'float' format
+    :return: list containng background subtracked images
+    """
+
+    output =[]
+    dummy =[]
+    images=[]
+    back_model =[]
+    back_model_size = 5
+    for keys in input_image_dct:
+        if len(dummy)!=0:
+            if len(dummy)> len(input_image_dct[keys]):
+                images = dummy
+                back_model = input_image_dct[keys]
+            else:
+                back_model=dummy
+                images = input_image_dct[keys]
+            break
+        dummy = input_image_dct[keys]
+
+    #back_sub = cv2.absdiff(b_lab_image, background_model)
+
+    back_model_idx=0
+    for idx in range(5,len(images)):
+        img = images[idx]
+        img = scaletofloat(img)
+        if (back_model_idx+1)% back_model_size ==0:
+            back_model_idx+=1
+        back_sub = cv2.absdiff(img, back_model[back_model_idx])
+        output.append(back_sub)
+
+    return output
+
 
 
 def justread():
@@ -140,7 +235,7 @@ def justread():
 
 
 def main():
-    img_process()
+    testing()
 
     justread()
 if __name__ == '__main__':
