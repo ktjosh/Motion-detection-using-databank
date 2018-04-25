@@ -11,7 +11,14 @@ import cv2
 import numpy as np
 from skimage.filters import threshold_otsu
 from skimage.measure import *
+import os
+import psutil
 
+def cpu_util():
+    pid = os.getpid()
+    py = psutil.Process(pid)
+    memoryUse = py.memory_info()[0] / (2. ** 20)  # memory use in MiB
+    return memoryUse
 
 def display_len(input_image_dct):
     print("\tlength of input dict:", len(input_image_dct))
@@ -29,8 +36,12 @@ def GrayScale(input_image_dct):
     :return:
     """
     output = []
+    temp =0
     for key in input_image_dct:
         for img in input_image_dct[key]:
+            mem = cpu_util()
+            temp = max(temp, mem)
+            print('M:', mem, "max:", temp)
             gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             output.append(gray_image)
     print("completed grayscale")
@@ -47,6 +58,7 @@ def imBinarize(input_image_dct):
 
     for key in input_image_dct:
         for img in input_image_dct[key]:
+
             thresh = threshold_otsu(img)
             ret, binarized = cv2.threshold(img, thresh, 1, cv2.THRESH_BINARY)
             output.append(binarized)
@@ -88,10 +100,16 @@ def VideoCapture(dct):
 
     # this path is just for testing
     output = []
-    path = "Experiment.mp4"
+    path = "Exp2.mp4"
     Vid = cv2.VideoCapture(path)
+    temp = 0
     while (Vid.isOpened()):
         # frame by frame is read here
+
+        mem = cpu_util()
+        temp = max(temp,mem)
+        print('M:', mem, "max:", temp)
+
         rt, frame = Vid.read()
         # grayscale
         if rt != False:
@@ -160,7 +178,13 @@ def Background_Subtraction_And_Binarize(input_image_dct):
 
     # print(len(images),len(back_model))
     back_model_idx=0
+    temp =0
     for idx in range(5,len(images)):
+
+        mem = cpu_util()
+        temp = max(temp,mem)
+        print('M:', mem, "max:", temp)
+
         img = images[idx]
         img = scaletofloat(img)
         if (idx+1)% back_model_size ==0:
@@ -191,7 +215,7 @@ def Blob_Detection_and_Bounding_box(input_img_dct):
     MINArea=5000
     colored_images=[]
     binarized_images =[]
-
+    temp =0
     for keys in input_img_dct:
         if len(input_img_dct[keys][0].shape)==3:
             colored_images= input_img_dct[keys]
@@ -205,6 +229,10 @@ def Blob_Detection_and_Bounding_box(input_img_dct):
     # print(len(colored_images))
     # print(len(binarized_images))
     for img_idx in range (len(colored_images)):
+        mem = cpu_util()
+        temp = max(temp,mem)
+        print('M:', mem, "max:", temp)
+
         camera_image= colored_images[img_idx]
 
         if(img_idx>=difference_in_frames):
@@ -260,7 +288,13 @@ def background_model(input_image_dct):
             break
     avg_img = np.zeros((height,width),dtype=float)
     for keys in input_image_dct:
+        temp =0
         for idx  in  range (len(input_image_dct[keys])):
+
+            mem = cpu_util()
+            temp = max(temp, mem)
+            print('M:', mem, "max:", temp)
+
             img = scaletofloat(input_image_dct[keys][idx])
             avg_img = cv2.add(avg_img, img)
             if (idx+1) % back_model_size == 0:

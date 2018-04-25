@@ -3,6 +3,8 @@ import cv2
 import numpy as np
 from skimage.filters import threshold_otsu
 from skimage.measure import *
+import os
+import psutil
 
 def img_process():
     ret, camera_image = cv2.VideoCapture(0).read()
@@ -37,7 +39,7 @@ def img_process():
 
 def testing():
     output=[]
-    path = "Experiment.mp4"
+    path = "Exp2.mp4"
     Vid = cv2.VideoCapture(path)
     colored_images =[]
     while (Vid.isOpened()):
@@ -135,10 +137,17 @@ def VideoCapture():
     """
 
     #this path is just for testing
-    path = "\\Experiment.mp4"
+    path = "Exp2.mp4"
     Vid = cv2.VideoCapture(path)
+    temp1 = 0
     while(Vid.isOpened()):
         #frame by frame is read here
+        pid = os.getpid()
+
+        py = psutil.Process(pid)
+        memoryUse = py.memory_info()[0] / (2. ** 20)  # memory use in MiB
+        temp1 = max(temp1, memoryUse)
+        print('memoryUse:', memoryUse, "Max:", temp1)
         _,frame = Vid.read()
 
     #code for converting it to grayscale
@@ -184,7 +193,14 @@ def Background_Model(input_image_dct):
             break
     avg_img = np.zeros((height,width),dtype=float)
     for keys in input_image_dct:
+        temp1 = 0
         for idx  in  range (len(input_image_dct[keys])):
+            pid = os.getpid()
+
+            py = psutil.Process(pid)
+            memoryUse = py.memory_info()[0] / (2. ** 20)  # memory use in MiB
+            temp1 = max(temp1, memoryUse)
+            print('memoryUse:', memoryUse, "Max:", temp1)
             img = scaletofloat(input_image_dct[keys][idx])
             avg_img = cv2.add(avg_img, img)
             if (idx+1) % back_model_size == 0:
@@ -227,7 +243,14 @@ def Background_Subtraction_And_Binarize(input_image_dct):
 
     # print(len(images),len(back_model))
     back_model_idx=0
+    temp1 = 0
     for idx in range(5,len(images)):
+        pid = os.getpid()
+
+        py = psutil.Process(pid)
+        memoryUse = py.memory_info()[0] / (2. ** 20)  # memory use in MiB
+        temp1 = max(temp1, memoryUse)
+        print('memoryUse:', memoryUse, "Max:", temp1)
         img = images[idx]
         img = scaletofloat(img)
         if (idx+1)% back_model_size ==0:

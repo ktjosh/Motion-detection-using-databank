@@ -6,16 +6,17 @@ from skimage.filters import threshold_otsu
 from skimage.measure import *
 from PIL import *
 
-
+import psutil
+import os
 def Do_image_processing():
 
     img_counter =0
 
+    path = "Exp2.mp4"
     capture_counter = 200
     do_subtraction = False
     avg_count = 4
     avg_image_counter = avg_count #takes averrage of those many images.
-    path = "C:\\Users\\ketan\\PycharmProjects\\untitled\\ssup\\Experiment.mp4"
     Vid = cv2.VideoCapture(path)
 
     forthefirsttime = True
@@ -23,11 +24,12 @@ def Do_image_processing():
     i=0
     MINArea=5000
     SECONDS=1
-
+    temp1 = 0
+    temp = 0
     while (Vid.isOpened()):
 
         _,camera_image = Vid.read()
-        print(i)
+        # print(i)
         img_height, img_width, img_channels = camera_image.shape
 
         if forthefirsttime:
@@ -38,6 +40,10 @@ def Do_image_processing():
             avfg_img = np.zeros((img_height, img_width), dtype=np.float)
             background_model = np.zeros((img_height, img_width), dtype=np.float)
             forthefirsttime = False
+
+        sys_mem = psutil.virtual_memory().percent
+        temp = max(temp,sys_mem)
+        print('Sys_mem:',sys_mem,"max:",temp)
 
 
         #converting image to grayscale
@@ -69,6 +75,19 @@ def Do_image_processing():
             #finding region in an image
             Bwlabel,num_regions =label(imopen_image, neighbors=None, background=0, return_num=True, connectivity=2)
 
+
+            a = cv2.Sobel(camera_image,cv2.CV_64F,1,0,ksize=5)
+            b = cv2.Sobel(camera_image,cv2.CV_64F,1,0,ksize=5)
+            c= cv2.Laplacian(camera_image,cv2.CV_64F)
+            kernel = np.ones((5, 5), np.float32) / 25
+            dst = cv2.filter2D(camera_image, -1, kernel)
+
+            pid = os.getpid()
+
+            py = psutil.Process(pid)
+            memoryUse = py.memory_info()[0] / (2. ** 20)  # memory use in MiB
+            temp1 = max(temp1, memoryUse)
+            print('memoryUse:', memoryUse, "Max:", temp1)
             #print(num_regions)
             Area_region = regionprops(Bwlabel, intensity_image= None, cache=True)
 
